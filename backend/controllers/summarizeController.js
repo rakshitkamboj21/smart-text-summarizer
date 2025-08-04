@@ -1,0 +1,194 @@
+import { getSummary } from '../utils/geminiUtil.js';
+import Summary from '../models/Summary.js';
+import pkg from '@vitalets/google-translate-api';
+import fetch from 'node-fetch'; // For URL content fetching
+
+const { translate } = pkg;
+
+/**
+ * POST /api/summarize
+ * Summarize plain text and optionally translate
+ */
+export const summarizeText = async (req, res) => {
+  const { text, language } = req.body;
+
+  if (!text || text.trim().length === 0) {
+    return res.status(400).json({ message: 'Text is required for summarization' });
+  }
+
+  try {
+    const englishSummary = await getSummary(text);
+    let finalSummary = englishSummary;
+    const targetLang = language || 'en';
+
+    // Translate if needed
+    if (targetLang !== 'en') {
+      try {
+        const translated = await translate(englishSummary, { to: targetLang });
+        finalSummary = translated.text;
+      } catch (err) {
+        console.error('Translation Error:', err.message);
+        return res.status(500).json({ message: 'Failed to translate summary' });
+      }
+    }
+
+    await Summary.create({
+      userId: req.user.id,
+      originalText: text,
+      summaryText: finalSummary,
+      language: targetLang,
+    });
+
+    res.status(201).json({ summary: finalSummary });
+  } catch (error) {
+    console.error('Summarization Error:', error.message);
+    res.status(500).json({ message: 'Failed to summarize text' });
+  }
+};
+
+/**
+ * POST /api/summarize/url
+ * Summarize content from a URL, and support translation
+ */
+export const summarizeURL = async (req, res) => {
+  const { url, language } = req.body;
+
+  if (!url || typeof url !== 'string') {
+    return res.status(400).json({ message: 'A valid URL is required.' });
+  }
+
+  try {
+    const response = await fetch(url);
+    const html = await response.text();
+
+    const extractedText = html.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
+    if (!extractedText || extractedText.length < 100) {
+      return res.status(400).json({ message: 'Failed to extract meaningful content from URL.' });
+    }
+
+    const englishSummary = await getSummary(extractedText);
+    let finalSummary = englishSummary;
+    const targetLang = language || 'en';
+
+    if (targetLang !== 'en') {
+      try {
+        const translated = await translate(englishSummary, { to: targetLang });
+        finalSummary = translated.text;
+      } catch (err) {
+        console.error('Translation Error:', err.message);
+        return res.status(500).json({ message: 'Failed to translate summary' });
+      }
+    }
+
+    await Summary.create({
+      userId: req.user.id,
+      originalText: `Content from URL: ${url}`,
+      summaryText: finalSummary,
+      language: targetLang,
+    });
+
+    res.status(200).json({ summary: finalSummary });
+  } catch (error) {
+    console.error('URL Summarization Error:', error.message);
+    res.status(500).json({ message: 'Failed to summarize content from URL.' });
+  }
+};
+
+/**
+ * POST /api/summarize/translate
+ * Translate provided text
+ */
+export const translateSummary = async (req, res) => {
+  const { text, targetLanguage } = req.body;
+
+  if (!text || !targetLanguage) {
+    return res.status(400).json({ message: 'Text and target language are required' });
+  }
+
+  try {
+    const translated = await translate(text, { to: targetLanguage });
+    res.status(200).json({ translatedText: translated.text });
+  } catch (err) {
+    console.error('Translate Route Error:', err.message);
+    res.status(500).json({ message: 'Translation failed' });
+  }
+};
+
+/**
+ * POST /api/summarize/save
+ * Save a summary directly (after translation on frontend)
+ */
+export const saveSummary = async (req, res) => {
+  try {
+    const { originalText, summaryText, language } = req.body;
+
+    if (!originalText || !summaryText || !language) {
+      return res.status(400).json({ message: 'Missing required fields.' });
+    }
+
+    const newSummary = new Summary({
+      userId: req.user.id,
+      originalText,
+      summaryText,
+      language,
+    });
+
+    await newSummary.save();
+    res.status(201).json({ message: 'Summary saved successfully' });
+  } catch (err) {
+    console.error('Save Error:', err.message);
+    res.status(500).json({ message: 'Failed to save summary.' });
+  }
+};
+
+/**
+ * GET /api/summarize/history
+ * Get all summaries by user
+ */
+export const getUserSummaries = async (req, res) => {
+  try {
+    const summaries = await Summary.find({ userId: req.user.id }).sort({ createdAt: -1 });
+    res.status(200).json({ history: summaries });
+  } catch (error) {
+    console.error('Fetch History Error:', error.message);
+    res.status(500).json({ message: 'Failed to fetch summaries' });
+  }
+};
+
+/**
+ * DELETE /api/summarize/:id
+ * Delete a single summary by ID
+ */
+export const deleteSummary = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const deleted = await Summary.findOneAndDelete({
+      _id: id,
+      userId: req.user.id,
+    });
+
+    if (!deleted) {
+      return res.status(404).json({ message: 'Summary not found or unauthorized' });
+    }
+
+    res.status(200).json({ message: 'Summary deleted successfully' });
+  } catch (error) {
+    console.error('Delete Summary Error:', error.message);
+    res.status(500).json({ message: 'Error deleting summary' });
+  }
+};
+
+/**
+ * DELETE /api/summarize
+ * Delete all summaries by user
+ */
+export const deleteAllSummaries = async (req, res) => {
+  try {
+    await Summary.deleteMany({ userId: req.user.id });
+    res.status(200).json({ message: 'All summaries deleted successfully' });
+  } catch (error) {
+    console.error('Delete All Summaries Error:', error.message);
+    res.status(500).json({ message: 'Error deleting all summaries' });
+  }
+};

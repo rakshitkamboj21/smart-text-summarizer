@@ -1,0 +1,269 @@
+/* === Base === */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+body {
+  font-family: 'Inter', sans-serif;
+  background-color: #f8fafc;
+  color: #1a202c;
+  line-height: 1.6;
+  padding: 20px;
+}
+
+/* === Container === */
+.dashboard-container {
+  max-width: 960px;
+  margin: auto;
+  padding: 20px;
+}
+
+/* === Header === */
+.dashboard-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #1e293b;
+  color: #ffffff;
+  padding: 16px 24px;
+  border-radius: 8px;
+  margin-bottom: 30px;
+}
+.logout-button {
+  background-color: #ef4444;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 5px;
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+.logout-button:hover {
+  background-color: #dc2626;
+}
+
+/* === Input Sections === */
+.input-section,
+.output-section,
+.email-section {
+  margin-bottom: 30px;
+}
+textarea {
+  width: 100%;
+  padding: 15px;
+  font-size: 1rem;
+  border-radius: 6px;
+  border: 1px solid #d1d5db;
+  resize: vertical;
+  min-height: 140px;
+}
+
+/* === Email Input === */
+.email-section input {
+  width: 100%;
+  padding: 10px;
+  font-size: 1rem;
+  border-radius: 6px;
+  border: 1px solid #d1d5db;
+  margin-top: 8px;
+}
+
+/* === URL Input === */
+.url-section {
+  margin-top: 18px;
+}
+.url-section input {
+  width: 100%;
+  padding: 10px;
+  font-size: 1rem;
+  border-radius: 6px;
+  border: 1px solid #d1d5db;
+  margin-top: 6px;
+}
+
+/* === Buttons === */
+.summarize-button,
+.voice-input-button,
+.tts-button {
+  margin-top: 10px;
+  padding: 10px 18px;
+  font-size: 1rem;
+  font-weight: 600;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+.summarize-button {
+  background-color: #2563eb;
+  color: white;
+}
+.summarize-button:hover {
+  background-color: #1d4ed8;
+}
+.voice-input-button {
+  background-color: #10b981;
+  color: white;
+}
+.voice-input-button:hover {
+  background-color: #059669;
+}
+.tts-button {
+  background-color: #f97316;
+  color: white;
+}
+.tts-button:hover {
+  background-color: #ea580c;
+}
+
+/* === Group Buttons === */
+.summarize-buttons {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 10px;
+}
+
+/* === Output Summary Box === */
+.summary-box {
+  background-color: white;
+  padding: 16px;
+  border-radius: 6px;
+  border: 1px solid #cbd5e1;
+  min-height: 100px;
+  white-space: pre-wrap;
+  font-size: 1rem;
+}
+
+/* === Download Buttons === */
+.download-buttons {
+  margin-top: 12px;
+}
+.download-buttons button {
+  background-color: #0ea5e9;
+  color: white;
+  padding: 10px 16px;
+  margin-right: 10px;
+  border: none;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+.download-buttons button:hover {
+  background-color: #0284c7;
+}
+
+/* === Language Selector === */
+.language-select {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 18px;
+  margin-bottom: 20px;
+}
+.language-select label {
+  font-size: 1rem;
+  font-weight: 500;
+}
+#languageSelect {
+  padding: 8px 12px;
+  border-radius: 6px;
+  border: 1px solid #d1d5db;
+  font-size: 1rem;
+  cursor: pointer;
+}
+#languageSelect:focus {
+  border-color: #2563eb;
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.3);
+}
+
+/* === History Section === */
+.summary-history {
+  margin-top: 40px;
+}
+.history-item {
+  background-color: #ffffff;
+  padding: 20px;
+  border-radius: 8px;
+  border: 1px solid #d1d5db;
+  margin-bottom: 20px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.03);
+}
+.history-item .input-text,
+.history-item .summary-text {
+  margin-bottom: 12px;
+  white-space: pre-wrap;
+}
+.delete-btn {
+  background-color: #dc2626;
+  color: white;
+  padding: 8px 12px;
+  border: none;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+.delete-btn:hover {
+  background-color: #b91c1c;
+}
+
+/* === Responsive Adjustments === */
+@media (max-width: 600px) {
+  .dashboard-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+  .download-buttons button {
+    margin-bottom: 10px;
+  }
+}
+
+/* === Dark Mode === */
+body.dark-mode {
+  background-color: #121212;
+  color: #f1f1f1;
+}
+
+body.dark-mode .dashboard-header {
+  background-color: #1e1e1e;
+  color: #fff;
+}
+
+body.dark-mode textarea,
+body.dark-mode input,
+body.dark-mode .summary-box,
+body.dark-mode .history-item,
+body.dark-mode .history-input,
+body.dark-mode .history-summary {
+  background-color: #1e1e1e;
+  color: #f1f1f1;
+  border: 1px solid #444;
+}
+
+body.dark-mode .summarize-button,
+body.dark-mode .tts-button,
+body.dark-mode .voice-input-button,
+body.dark-mode .download-buttons button,
+body.dark-mode .logout-button,
+body.dark-mode .delete-button,
+body.dark-mode #darkModeToggle {
+  background-color: #333;
+  color: #fff;
+}
+
+.dark-toggle-button {
+  background-color: #444;
+  color: #fff;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+}

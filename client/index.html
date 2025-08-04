@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Smart Text Summarizer</title>
+
+  <!-- Redirect to login if not authenticated -->
+  <script>
+    const token = localStorage.getItem("token");
+    if (!token) {
+      window.location.href = "login.html";
+    }
+  </script>
+
+  <!-- Styles & Fonts -->
+  <link rel="stylesheet" href="style/styles.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="icon" href="data:,">
+</head>
+<body>
+  <div class="dashboard-container">
+    <!-- Header -->
+    <header class="dashboard-header">
+      <h1>🧠 Smart Text Summarizer</h1>
+      <button id="darkModeToggle" class="dark-toggle-button">🌙 Dark Mode</button>
+      <button id="logoutBtn" class="logout-button">Logout</button>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <!-- Text Input Section -->
+      <section class="input-section">
+        <h2>Enter Text or URL to Summarize</h2>
+
+        <!-- 📧 Email Input Field -->
+        <div class="email-section">
+          <label for="emailInput">📧 Your Email:</label>
+          <input type="email" id="emailInput" placeholder="Enter your email..." required />
+        </div>
+
+        <!-- ✍️ Text Input -->
+        <textarea id="textInput" placeholder="Paste your text here..." rows="10"></textarea>
+
+        <!-- 🔗 URL Input -->
+        <div class="url-section">
+          <label for="urlInput">🔗 Or enter a webpage URL:</label>
+          <input type="url" id="urlInput" placeholder="https://example.com/article" />
+        </div>
+
+        <!-- 🎤 Voice Input Button -->
+        <button id="voiceInputBtn" class="voice-input-button">🎤 Speak</button>
+
+        <!-- 🌐 Language Selection -->
+        <div class="language-select">
+          <label for="languageSelect">🌐 Language:</label>
+          <select id="languageSelect">
+            <option value="en">English</option>
+            <option value="hi">Hindi</option>
+            <option value="es">Spanish</option>
+            <option value="fr">French</option>
+            <option value="de">German</option>
+            <option value="mr">Marathi</option>
+            <option value="sa">Sanskrit</option>
+          </select>
+        </div>
+
+        <!-- ✨ Buttons -->
+        <div class="summarize-buttons">
+          <button class="summarize-button" id="summarizeBtn">Summarize Text</button>
+          <button class="summarize-button" id="summarizeUrlBtn">Summarize from URL</button>
+        </div>
+      </section>
+
+      <!-- Output Section -->
+      <section class="output-section">
+        <h2>📝 Summary</h2>
+        <div id="summaryOutput" class="summary-box">Summary will appear here...</div>
+
+        <!-- 🔊 Text to Speech -->
+        <button id="speakSummaryBtn" class="tts-button">🔊 Listen</button>
+
+        <!-- 💾 Download Buttons -->
+        <div class="download-buttons">
+          <button id="downloadTxt">Download as .txt</button>
+          <button id="downloadPdf">Download as .pdf</button>
+        </div>
+      </section>
+
+      <!-- History Section -->
+      <section class="history-section">
+        <h2>📜 Summary History</h2>
+        <ul id="historyList" class="history-list"></ul>
+        <button id="deleteAllBtn" class="delete-all-button">🗑️ Delete All</button>
+      </section>
+    </main>
+  </div>
+
+  <!-- jsPDF for PDF download -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+  <!-- Main Script -->
+  <script type="module" src="app.js"></script>
+  <script type="module" src="./fontData.js"></script> 
+</body>
+</html> 
