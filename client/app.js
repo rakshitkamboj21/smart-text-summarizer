@@ -3,6 +3,48 @@ import { notoSansBase64 } from './fontData.js';
 document.addEventListener("DOMContentLoaded", () => {
   const API_BASE = "http://localhost:5000/api";
   const token = localStorage.getItem("token");
+
+  // 📨 CONTACT FORM HANDLING (only on contact page)
+  if (window.location.pathname.includes("contact")) {
+    const form = document.getElementById("contactForm");
+    const responseMsg = document.getElementById("responseMessage");
+
+    if (form) {
+      form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const name = document.getElementById("name").value.trim();
+        const email = document.getElementById("email").value.trim();
+        const message = document.getElementById("message").value.trim();
+
+        if (!name || !email || !message) {
+          responseMsg.textContent = "Please fill in all fields.";
+          return;
+        }
+
+        try {
+          const res = await fetch(`${API_BASE}/contact`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ name, email, message }),
+          });
+
+          const data = await res.json();
+          responseMsg.textContent = data.message;
+
+          if (res.ok) {
+            form.reset();
+          }
+        } catch (err) {
+          console.error("Contact form error:", err);
+          responseMsg.textContent = "❌ Failed to send message.";
+        }
+      });
+    }
+
+    return; // Skip rest of logic if on contact page
+  }
+
+  // 🧠 SUMMARIZER + HISTORY (only for logged in users)
   if (!token) {
     window.location.href = "login.html";
     return;
@@ -21,8 +63,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
   async function summarize({ isUrl = false }) {
     const email = emailInput.value.trim();
-    const selectedLang = languageSelect.value;
     const input = isUrl ? urlInput.value.trim() : textInput.value.trim();
+    const language = languageSelect.value;
 
     if (!input) return alert(`Please enter ${isUrl ? "a URL" : "text"} to summarize.`);
     if (!email) return alert("Please enter your email.");
@@ -32,7 +74,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
     try {
       const endpoint = isUrl ? "/summarize/url" : "/summarize";
-      const payloadKey = isUrl ? "url" : "text";
+      const payload = {
+        [isUrl ? "url" : "text"]: input,
+        language,
+      };
 
       const response = await fetch(`${API_BASE}${endpoint}`, {
         method: "POST",
@@ -40,46 +85,43 @@ document.addEventListener("DOMContentLoaded", () => {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({
-          [payloadKey]: input,
-          language: selectedLang,
-        }),
+        body: JSON.stringify(payload),
       });
 
       const data = await response.json();
       if (!response.ok) throw new Error(data.message || "Summarization failed.");
 
-      const summary = data.summaryText || data.summary;
-      summaryOutput.innerText = summary;
-      currentSummary = summary;
+      currentSummary = data.summaryText || data.summary || "";
+      summaryOutput.innerText = currentSummary;
 
       await fetchHistory();
 
-      const emailRes = await fetch(`${API_BASE}/email/send`, {
+      const emailResponse = await fetch(`${API_BASE}/email/send`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({ toEmail: email, summary }),
+        body: JSON.stringify({ toEmail: email, summary: currentSummary }),
       });
 
-      const emailData = await emailRes.json();
-      if (!emailRes.ok) throw new Error(emailData.message || "Email failed.");
+      const emailData = await emailResponse.json();
+      if (!emailResponse.ok) throw new Error(emailData.message || "Email sending failed.");
       alert("✅ Summary emailed successfully!");
     } catch (err) {
-      console.error("Summarization Error:", err.message);
+      console.error("Summarize Error:", err.message);
       summaryOutput.innerText = "❌ Error generating summary.";
     }
   }
 
   async function fetchHistory() {
     try {
-      const res = await fetch(`${API_BASE}/summarize/history`, {
+      const response = await fetch(`${API_BASE}/summarize/history`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.message);
+
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.message || "Failed to fetch history.");
 
       historyContainer.innerHTML = "";
       if (!data.history || data.history.length === 0) {
@@ -112,47 +154,43 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
- function downloadSummary(type) {
-  const summary = currentSummary.trim();
-  if (!summary || summary.length < 5 || summary.startsWith("⏳") || summary.startsWith("❌")) {
-    return alert("⚠️ Cannot download. Please generate a valid summary first.");
-  }
-
-  if (type === "txt") {
-    const blob = new Blob([summary], { type: "text/plain;charset=utf-8" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = "summary.txt";
-    a.click();
-    URL.revokeObjectURL(url);
-  } else if (type === "pdf") {
-    const { jsPDF } = window.jspdf;
-    const doc = new jsPDF();
-
-    const lang = languageSelect.value;
-
-    if (lang === "hi" || /[^\u0000-\u007F]+/.test(summary)) {
-      // If Hindi or any non-ASCII characters exist, use Unicode-compatible font
-      doc.addFileToVFS("NotoSans-Regular.ttf", notoSansBase64);
-      doc.addFont("NotoSans-Regular.ttf", "NotoSans", "normal");
-      doc.setFont("NotoSans");
-    } else {
-      // Use built-in font for English
-      doc.setFont("helvetica");
+  function downloadSummary(type) {
+    const summary = currentSummary.trim();
+    if (!summary || summary.startsWith("⏳") || summary.startsWith("❌")) {
+      return alert("⚠️ Please generate a valid summary first.");
     }
 
-    doc.setFontSize(12);
-    doc.text("Smart Text Summary:", 10, 10);
-    const lines = doc.splitTextToSize(summary, 180);
-    doc.text(lines, 10, 20);
-    doc.save("summary.pdf");
-  }
-}
+    if (type === "txt") {
+      const blob = new Blob([summary], { type: "text/plain;charset=utf-8" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "summary.txt";
+      a.click();
+      URL.revokeObjectURL(url);
+    } else if (type === "pdf") {
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF();
 
+      const lang = languageSelect.value;
+      if (lang === "hi" || /[^\u0000-\u007F]/.test(summary)) {
+        doc.addFileToVFS("NotoSans-Regular.ttf", notoSansBase64);
+        doc.addFont("NotoSans-Regular.ttf", "NotoSans", "normal");
+        doc.setFont("NotoSans");
+      } else {
+        doc.setFont("helvetica");
+      }
+
+      doc.setFontSize(12);
+      doc.text("Smart Text Summary:", 10, 10);
+      const lines = doc.splitTextToSize(summary, 180);
+      doc.text(lines, 10, 20);
+      doc.save("summary.pdf");
+    }
+  }
 
   async function deleteAllHistory() {
-    if (!confirm("Are you sure you want to delete all summary history?")) return;
+    if (!confirm("Delete all summary history?")) return;
 
     try {
       const res = await fetch(`${API_BASE}/summarize`, {
@@ -194,7 +232,7 @@ document.addEventListener("DOMContentLoaded", () => {
     };
   } else if (voiceInputBtn) {
     voiceInputBtn.disabled = true;
-    voiceInputBtn.title = "Speech recognition not supported in this browser.";
+    voiceInputBtn.title = "Speech recognition not supported.";
   }
 
   // 🔊 Text-to-Speech
@@ -202,7 +240,6 @@ document.addEventListener("DOMContentLoaded", () => {
     speakSummaryBtn.addEventListener("click", () => {
       const summary = currentSummary.trim();
       if (!summary) return alert("Please generate a summary first.");
-
       const utterance = new SpeechSynthesisUtterance(summary);
       utterance.lang = languageSelect?.value || "en-US";
       window.speechSynthesis.speak(utterance);
@@ -228,5 +265,6 @@ document.addEventListener("DOMContentLoaded", () => {
   document.getElementById("deleteAllBtn")?.addEventListener("click", deleteAllHistory);
   document.getElementById("logoutBtn")?.addEventListener("click", logoutUser);
 
+  // ⏬ Load history on page load
   fetchHistory();
 });

@@ -12,149 +12,81 @@ body {
   padding: 20px;
 }
 
-/* === Container === */
+/* === Layout === */
+main {
+  padding: 20px;
+}
 .dashboard-container {
   max-width: 960px;
   margin: auto;
   padding: 20px;
 }
 
-/* === Header === */
-.dashboard-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+/* === Navbar === */
+.navbar {
   background-color: #1e293b;
-  color: #ffffff;
   padding: 16px 24px;
   border-radius: 8px;
   margin-bottom: 30px;
 }
-.logout-button {
-  background-color: #ef4444;
-  border: none;
-  padding: 8px 14px;
-  border-radius: 5px;
-  color: white;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
+.navbar-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
-.logout-button:hover {
-  background-color: #dc2626;
+.logo {
+  color: #fff;
+  font-size: 1.4rem;
+  font-weight: 700;
+}
+.navbar-buttons button {
+  margin-left: 10px;
 }
 
-/* === Input Sections === */
+/* === Hero === */
+.hero-section {
+  text-align: center;
+  margin: 40px auto 50px;
+  padding: 20px;
+  max-width: 800px;
+}
+.hero-content h2 {
+  font-size: 2rem;
+  margin-bottom: 10px;
+  color:#4d1f7f;
+}
+.hero-content p {
+  font-size: 1.1rem;
+  color: #475569;
+}
+
+/* === Buttons Section === */
+.action-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+/* === Inputs === */
 .input-section,
 .output-section,
 .email-section {
   margin-bottom: 30px;
 }
-textarea {
+textarea,
+input[type="email"],
+input[type="url"] {
   width: 100%;
   padding: 15px;
   font-size: 1rem;
   border-radius: 6px;
   border: 1px solid #d1d5db;
-  resize: vertical;
-  min-height: 140px;
-}
-
-/* === Email Input === */
-.email-section input {
-  width: 100%;
-  padding: 10px;
-  font-size: 1rem;
-  border-radius: 6px;
-  border: 1px solid #d1d5db;
   margin-top: 8px;
+  resize: vertical;
 }
-
-/* === URL Input === */
-.url-section {
-  margin-top: 18px;
-}
-.url-section input {
-  width: 100%;
-  padding: 10px;
-  font-size: 1rem;
-  border-radius: 6px;
-  border: 1px solid #d1d5db;
-  margin-top: 6px;
-}
-
-/* === Buttons === */
-.summarize-button,
-.voice-input-button,
-.tts-button {
-  margin-top: 10px;
-  padding: 10px 18px;
-  font-size: 1rem;
-  font-weight: 600;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-}
-.summarize-button {
-  background-color: #2563eb;
-  color: white;
-}
-.summarize-button:hover {
-  background-color: #1d4ed8;
-}
-.voice-input-button {
-  background-color: #10b981;
-  color: white;
-}
-.voice-input-button:hover {
-  background-color: #059669;
-}
-.tts-button {
-  background-color: #f97316;
-  color: white;
-}
-.tts-button:hover {
-  background-color: #ea580c;
-}
-
-/* === Group Buttons === */
-.summarize-buttons {
-  display: flex;
-  gap: 12px;
-  flex-wrap: wrap;
-  margin-top: 10px;
-}
-
-/* === Output Summary Box === */
-.summary-box {
-  background-color: white;
-  padding: 16px;
-  border-radius: 6px;
-  border: 1px solid #cbd5e1;
-  min-height: 100px;
-  white-space: pre-wrap;
-  font-size: 1rem;
-}
-
-/* === Download Buttons === */
-.download-buttons {
-  margin-top: 12px;
-}
-.download-buttons button {
-  background-color: #0ea5e9;
-  color: white;
-  padding: 10px 16px;
-  margin-right: 10px;
-  border: none;
-  border-radius: 6px;
-  font-weight: 600;
-  font-size: 0.95rem;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-}
-.download-buttons button:hover {
-  background-color: #0284c7;
+textarea {
+  min-height: 140px;
 }
 
 /* === Language Selector === */
@@ -162,8 +94,7 @@ textarea {
   display: flex;
   align-items: center;
   gap: 12px;
-  margin-top: 18px;
-  margin-bottom: 20px;
+  margin: 20px 0;
 }
 .language-select label {
   font-size: 1rem;
@@ -182,9 +113,99 @@ textarea {
   box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.3);
 }
 
-/* === History Section === */
-.summary-history {
+/* === Buttons === */
+button {
+  cursor: pointer;
+}
+.summarize-button,
+.voice-input-button,
+.tts-button {
+  padding: 10px 18px;
+  font-size: 1rem;
+  font-weight: 600;
+  border: none;
+  border-radius: 6px;
+  transition: background-color 0.3s ease;
+}
+.summarize-button {
+  background-color: #2563eb;
+  color: white;
+}
+.summarize-button:hover {
+  background-color: #1d4ed8;
+}
+.voice-input-button {
+  background-color: #10b981;
+  color: white;
+  margin-top: 10px;
+}
+.voice-input-button:hover {
+  background-color: #059669;
+}
+.tts-button {
+  background-color: #f97316;
+  color: white;
+}
+.tts-button:hover {
+  background-color: #ea580c;
+}
+.logout-button,
+.dark-toggle-button {
+  background-color: #ef4444;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 5px;
+  color: white;
+  font-weight: 600;
+}
+.logout-button:hover {
+  background-color: #dc2626;
+}
+.dark-toggle-button {
+  background-color: #334155;
+}
+.dark-toggle-button:hover {
+  background-color: #1e293b;
+}
+
+/* === Output === */
+.summary-box {
+  background-color: white;
+  padding: 16px;
+  border-radius: 6px;
+  border: 1px solid #cbd5e1;
+  min-height: 100px;
+  white-space: pre-wrap;
+  font-size: 1rem;
+}
+
+/* === Download Buttons === */
+.download-buttons {
+  margin-top: 12px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.download-buttons button {
+  background-color: #0ea5e9;
+  color: white;
+  padding: 10px 16px;
+  border: none;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+.download-buttons button:hover {
+  background-color: #0284c7;
+}
+
+/* === History === */
+.history-section {
   margin-top: 40px;
+}
+.history-list {
+  list-style-type: none;
+  padding-left: 0;
 }
 .history-item {
   background-color: #ffffff;
@@ -194,34 +215,52 @@ textarea {
   margin-bottom: 20px;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.03);
 }
-.history-item .input-text,
-.history-item .summary-text {
-  margin-bottom: 12px;
-  white-space: pre-wrap;
-}
-.delete-btn {
+.delete-all-button {
   background-color: #dc2626;
   color: white;
   padding: 8px 12px;
   border: none;
   border-radius: 6px;
   font-weight: 600;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
 }
-.delete-btn:hover {
+.delete-all-button:hover {
   background-color: #b91c1c;
 }
 
-/* === Responsive Adjustments === */
+/* === Footer === */
+.footer {
+  margin-top: 60px;
+  padding: 20px;
+  text-align: center;
+  border-top: 1px solid #e2e8f0;
+  color: #64748b;
+  font-size: 0.95rem;
+}
+.footer-links {
+  margin-top: 20px;
+}
+.footer-links a {
+  margin: 0 10px;
+  text-decoration: none;
+  color: #2563eb;
+  font-weight: 500;
+}
+
+/* === Responsive === */
 @media (max-width: 600px) {
-  .dashboard-header {
+  .navbar-container {
     flex-direction: column;
     align-items: flex-start;
     gap: 10px;
   }
-  .download-buttons button {
-    margin-bottom: 10px;
+  .hero-content h2 {
+    font-size: 1.6rem;
+  }
+  .action-buttons {
+    flex-direction: column;
+  }
+  .download-buttons {
+    flex-direction: column;
   }
 }
 
@@ -230,40 +269,53 @@ body.dark-mode {
   background-color: #121212;
   color: #f1f1f1;
 }
-
-body.dark-mode .dashboard-header {
-  background-color: #1e1e1e;
-  color: #fff;
-}
-
-body.dark-mode textarea,
-body.dark-mode input,
+body.dark-mode .navbar,
+body.dark-mode .hero-section,
 body.dark-mode .summary-box,
 body.dark-mode .history-item,
-body.dark-mode .history-input,
-body.dark-mode .history-summary {
+body.dark-mode textarea,
+body.dark-mode input,
+body.dark-mode select {
   background-color: #1e1e1e;
   color: #f1f1f1;
-  border: 1px solid #444;
+  border-color: #444;
 }
-
+body.dark-mode .footer {
+  border-top-color: #333;
+  color: #aaa;
+}
+body.dark-mode .download-buttons button,
 body.dark-mode .summarize-button,
 body.dark-mode .tts-button,
 body.dark-mode .voice-input-button,
-body.dark-mode .download-buttons button,
 body.dark-mode .logout-button,
-body.dark-mode .delete-button,
-body.dark-mode #darkModeToggle {
+body.dark-mode .delete-all-button,
+body.dark-mode .dark-toggle-button {
   background-color: #333;
   color: #fff;
 }
+.voice-actions {
+  display: flex;
+  gap: 10px;
+  margin: 10px 0;
+  flex-wrap: wrap;
+}
+.listen-button-container {
+  margin-top: 20px;
+  text-align: left;
+}
 
-.dark-toggle-button {
-  background-color: #444;
-  color: #fff;
+.tts-button {
+  background-color: #ff7a00;
   border: none;
-  padding: 8px 12px;
-  border-radius: 6px;
+  color: white;
+  padding: 10px 16px;
+  font-size: 15px;
+  border-radius: 5px;
   cursor: pointer;
-  font-weight: 600;
+  transition: background-color 0.3s ease;
+}
+
+.tts-button:hover {
+  background-color: #e96d00;
 }

@@ -1,0 +1,54 @@
+/* Global Styles */
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #f4f6f9;
+  margin: 0;
+  padding: 0;
+  color: #333;
+}
+
+/* Container Box */
+.container {
+  max-width: 800px;
+  margin: 60px auto;
+  padding: 40px 30px;
+  background-color: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
+}
+
+/* FAQ Items */
+.faq-item {
+  margin-bottom: 24px;
+  border-left: 4px solid #007bff;
+  padding-left: 12px;
+}
+
+/* Headings */
+h3 {
+  color: #007bff;
+  margin-bottom: 8px;
+  font-size: 20px;
+}
+
+/* Footer Section */
+footer {
+  text-align: center;
+  padding: 20px 10px;
+  background-color: #f0f2f5;
+  color: #666;
+  border-top: 1px solid #ddd;
+}
+
+/* Footer Links */
+.footer-links a {
+  color: #007bff;
+  margin: 0 8px;
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+.footer-links a:hover {
+  color: #0056b3;
+  text-decoration: underline;
+}

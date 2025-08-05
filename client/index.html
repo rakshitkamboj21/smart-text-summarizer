@@ -20,15 +20,27 @@
   <link rel="icon" href="data:,">
 </head>
 <body>
-  <div class="dashboard-container">
-    <!-- Header -->
-    <header class="dashboard-header">
-      <h1>🧠 Smart Text Summarizer</h1>
-      <button id="darkModeToggle" class="dark-toggle-button">🌙 Dark Mode</button>
-      <button id="logoutBtn" class="logout-button">Logout</button>
-    </header>
+  <!-- ✅ Navbar -->
+  <nav class="navbar">
+    <div class="navbar-container">
+      <h1 class="logo">🧠 Smart Text Summarizer</h1>
+      <div class="navbar-buttons">
+        <button id="darkModeToggle" class="dark-toggle-button">🌙 Dark Mode</button>
+        <button id="logoutBtn" class="logout-button">Logout</button>
+      </div>
+    </div>
+  </nav>
 
-    <!-- Main Content -->
+  <!-- ✅ Hero Section -->
+  <section class="hero-section">
+    <div class="hero-content">
+      <h2>Summarize smarter, not harder.</h2>
+      <p>Effortlessly turn long articles or pages into bite-sized summaries using AI. Enter text, paste a URL, or speak directly!</p>
+    </div>
+  </section>
+
+  <!-- ✅ Main Dashboard -->
+  <div class="dashboard-container">
     <main class="main-content">
       <!-- Text Input Section -->
       <section class="input-section">
@@ -49,7 +61,7 @@
           <input type="url" id="urlInput" placeholder="https://example.com/article" />
         </div>
 
-        <!-- 🎤 Voice Input Button -->
+        <!-- 🎤 Voice Input -->
         <button id="voiceInputBtn" class="voice-input-button">🎤 Speak</button>
 
         <!-- 🌐 Language Selection -->
@@ -66,7 +78,7 @@
           </select>
         </div>
 
-        <!-- ✨ Buttons -->
+        <!-- ✨ Summarize Buttons -->
         <div class="summarize-buttons">
           <button class="summarize-button" id="summarizeBtn">Summarize Text</button>
           <button class="summarize-button" id="summarizeUrlBtn">Summarize from URL</button>
@@ -78,8 +90,10 @@
         <h2>📝 Summary</h2>
         <div id="summaryOutput" class="summary-box">Summary will appear here...</div>
 
-        <!-- 🔊 Text to Speech -->
-        <button id="speakSummaryBtn" class="tts-button">🔊 Listen</button>
+        <!-- 🔊 Text-to-Speech -->
+        <div class="listen-button-container">
+          <button id="speakSummaryBtn" class="tts-button">🔊 Listen</button>
+        </div>
 
         <!-- 💾 Download Buttons -->
         <div class="download-buttons">
@@ -97,11 +111,21 @@
     </main>
   </div>
 
-  <!-- jsPDF for PDF download -->
+  <!-- ✅ Footer -->
+  <footer class="footer">
+    <p>© 2025 Smart Text Summarizer | Built with ❤️ by Rakshit</p>
+    <div class="footer-links">
+      <a href="about.html">About</a>
+      <a href="contact.html">Contact</a>
+      <a href="faq.html">FAQ</a>
+    </div>
+  </footer>
+
+  <!-- PDF Download Script -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
-  <!-- Main Script -->
+  <!-- Main Scripts -->
   <script type="module" src="app.js"></script>
-  <script type="module" src="./fontData.js"></script> 
+  <script type="module" src="./fontData.js"></script>
 </body>
-</html> 
+</html>
