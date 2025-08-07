@@ -23,9 +23,12 @@ const __dirname = path.dirname(__filename);
 
 // === CORS Configuration ===
 app.use(cors({
-  origin: "https://moonlit-kitsune-4179ad.netlify.app/", // Netlify frontend
+  origin: [
+    "https://brilliant-peony-573c56.netlify.app",
+    "https://moonlit-kitsune-4179ad.netlify.app"
+  ],
   methods: ["GET", "POST", "PUT", "DELETE"],
-  credentials: true, // Allow cookies/headers if used
+  credentials: true,
 }));
 
 // Middleware
