@@ -22,14 +22,24 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 // === CORS Configuration ===
+const allowedOrigins = [
+  "https://brilliant-peony-573c56.netlify.app",
+  "https://moonlit-kitsune-4179ad.netlify.app"
+];
+
 app.use(cors({
-  origin: [
-    "https://brilliant-peony-573c56.netlify.app",
-    "https://moonlit-kitsune-4179ad.netlify.app"
-  ],
+  origin: function (origin, callback) {
+    // Allow requests with no origin (like mobile apps or curl)
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error("CORS not allowed for this origin: " + origin));
+    }
+  },
   methods: ["GET", "POST", "PUT", "DELETE"],
   credentials: true,
 }));
+
 
 // Middleware
 app.use(express.json());
