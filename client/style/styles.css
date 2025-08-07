@@ -258,6 +258,7 @@ button {
   }
   .action-buttons {
     flex-direction: column;
+    gap: 12px;
   }
   .download-buttons {
     flex-direction: column;

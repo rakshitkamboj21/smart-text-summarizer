@@ -1,7 +1,8 @@
 import { getSummary } from '../utils/geminiUtil.js';
 import Summary from '../models/Summary.js';
 import pkg from '@vitalets/google-translate-api';
-import fetch from 'node-fetch'; // For URL content fetching
+import fetch from 'node-fetch';
+import { JSDOM } from 'jsdom';
 
 const { translate } = pkg;
 
@@ -21,7 +22,6 @@ export const summarizeText = async (req, res) => {
     let finalSummary = englishSummary;
     const targetLang = language || 'en';
 
-    // Translate if needed
     if (targetLang !== 'en') {
       try {
         const translated = await translate(englishSummary, { to: targetLang });
@@ -58,15 +58,33 @@ export const summarizeURL = async (req, res) => {
   }
 
   try {
-    const response = await fetch(url);
-    const html = await response.text();
+    const response = await fetch(url, {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Node.js fetch)',
+      },
+    });
 
-    const extractedText = html.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
-    if (!extractedText || extractedText.length < 100) {
+    const html = await response.text();
+    const dom = new JSDOM(html);
+    const document = dom.window.document;
+
+    // Extract paragraphs and headings
+    let textContent = '';
+    const elements = document.querySelectorAll('p, h1, h2, h3');
+    elements.forEach(el => {
+      textContent += el.textContent.trim() + ' ';
+    });
+
+    textContent = textContent.trim().replace(/\s+/g, ' ');
+
+    if (!textContent || textContent.length < 100) {
       return res.status(400).json({ message: 'Failed to extract meaningful content from URL.' });
     }
 
-    const englishSummary = await getSummary(extractedText);
+    // Limit to 8000 characters (safe input size for Gemini)
+    const trimmedText = textContent.slice(0, 8000);
+    const englishSummary = await getSummary(trimmedText);
+
     let finalSummary = englishSummary;
     const targetLang = language || 'en';
 
@@ -89,7 +107,7 @@ export const summarizeURL = async (req, res) => {
 
     res.status(200).json({ summary: finalSummary });
   } catch (error) {
-    console.error('URL Summarization Error:', error.message);
+    console.error('URL Summarization Error:', error);
     res.status(500).json({ message: 'Failed to summarize content from URL.' });
   }
 };

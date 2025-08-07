@@ -20,33 +20,33 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     try {
-      const res = await fetch('http://localhost:5000/api/auth/register', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ username, email, password })
-      });
-
-      const data = await res.json();
-
-      if (res.ok) {
-        displayMessage(`✅ ${data.msg || 'Account created successfully!'}`, 'success');
-        signupForm.reset();
-        setTimeout(() => {
-          window.location.href = 'login.html';
-        }, 1500);
-      } else {
-        displayMessage(`❌ ${data.msg || 'Registration failed'}`, 'error');
-      }
-    } catch (err) {
-      console.error(err);
-      displayMessage('❌ Network error. Please try again.', 'error');
-    }
+  const res = await fetch('https://smart-text-summarizer-87n6.onrender.com/api/auth/register', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({ username, email, password })
   });
+
+  const data = await res.json();
+
+  if (res.ok) {
+    displayMessage(`✅ ${data.msg || 'Account created successfully!'}`, 'success');
+    signupForm.reset();
+    setTimeout(() => {
+      window.location.href = 'login.html';
+    }, 1500);
+  } else {
+    displayMessage(`❌ ${data.msg || 'Registration failed'}`, 'error');
+  }
+} catch (err) {
+  console.error(err);
+  displayMessage('❌ Network error. Please try again.', 'error');
+}
 
   function displayMessage(msg, type) {
     signupMessage.textContent = msg;
     signupMessage.style.color = type === 'error' ? 'red' : 'green';
   }
 });
+})
