@@ -21,9 +21,16 @@ const PORT = process.env.PORT || 5000;
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+// === CORS Configuration ===
+app.use(cors({
+  origin: "https://admirable-clafoutis-ae203f.netlify.app", // Netlify frontend
+  methods: ["GET", "POST", "PUT", "DELETE"],
+  credentials: true, // Allow cookies/headers if used
+}));
+
 // Middleware
-app.use(cors());
 app.use(express.json());
+app.use(express.urlencoded({ extended: true })); // Optional: parses form submissions
 
 // API Routes
 app.use('/api/auth', authRoutes);
@@ -31,10 +38,11 @@ app.use('/api/summarize', summarizeRoutes);
 app.use('/api/email', emailRoutes);
 app.use('/api/contact', contactRoutes);
 
-// Serve static frontend files (from client folder)
+// === Serve Frontend (Optional for monorepo hosting) ===
+// If you're hosting frontend separately (e.g., Netlify), you may not need this
 app.use(express.static(path.join(__dirname, '../client')));
 
-// Root route: Redirect to login page
+// Root route
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, '../client/login.html'));
 });
@@ -44,19 +52,19 @@ app.use((req, res) => {
   res.status(404).json({ message: "Route not found" });
 });
 
-// MongoDB Connection and Server Start
+// MongoDB Connection + Server Start
 mongoose.connect(process.env.MONGO_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
-  dbName: 'textsummarizer', // Ensures the correct DB name
+  dbName: 'textsummarizer',
 })
 .then(() => {
   console.log("✅ Connected to MongoDB Atlas");
   app.listen(PORT, () => {
-    console.log(`🚀 Server running on http://localhost:${PORT}`);
+    console.log(`🚀 Server running on port ${PORT}`);
   });
 })
 .catch((err) => {
   console.error("❌ MongoDB connection error:", err.message);
-  process.exit(1); // Exit app if DB connection fails
+  process.exit(1);
 });
