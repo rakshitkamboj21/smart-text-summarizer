@@ -22,11 +22,12 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 // === CORS Configuration ===
+// === CORS Configuration ===
 const allowedOrigins = [
   "https://brilliant-peony-573c56.netlify.app",
-  "https://moonlit-kitsune-4179ad.netlify.app"
+  "https://moonlit-kitsune-4179ad.netlify.app",
+  "https://silver-gumdrop-dc212b.netlify.app" // ✅ Your current site
 ];
-
 app.use(cors({
   origin: function (origin, callback) {
     // Allow requests with no origin (like mobile apps or curl)
