@@ -134,6 +134,12 @@ button {
 .summarize-button:hover {
   background-color: #1d4ed8;
 }
+
+/* ✅ Added spacing only between the two Summarize buttons */
+.summarize-button:first-of-type {
+  margin-bottom: 10px;
+}
+
 .voice-input-button {
   background-color: #10b981;
   color: white;
