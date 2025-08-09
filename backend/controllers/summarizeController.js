@@ -1,36 +1,10 @@
 import { getSummary } from '../utils/geminiUtil.js';
 import Summary from '../models/Summary.js';
+import pkg from '@vitalets/google-translate-api';
 import fetch from 'node-fetch';
 import { JSDOM } from 'jsdom';
 
-/**
- * Helper function: Translate text using LibreTranslate API
- * Supports multi-language translation without API keys or rate limits (for small usage)
- */
-async function libreTranslate(text, targetLang, sourceLang = 'auto') {
-  try {
-    const response = await fetch('https://libretranslate.com/translate', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        q: text,
-        source: sourceLang,
-        target: targetLang,
-        format: 'text',
-      }),
-    });
-
-    if (!response.ok) {
-      throw new Error(`LibreTranslate API error: ${response.statusText}`);
-    }
-
-    const data = await response.json();
-    return data.translatedText;
-  } catch (error) {
-    console.error('LibreTranslate Error:', error.message);
-    throw error;
-  }
-}
+const { translate } = pkg;
 
 /**
  * POST /api/summarize
@@ -50,7 +24,8 @@ export const summarizeText = async (req, res) => {
 
     if (targetLang !== 'en') {
       try {
-        finalSummary = await libreTranslate(englishSummary, targetLang);
+        const translated = await translate(englishSummary, { to: targetLang });
+        finalSummary = translated.text;
       } catch (err) {
         console.error('Translation Error:', err.message);
         return res.status(500).json({ message: 'Failed to translate summary' });
@@ -115,7 +90,8 @@ export const summarizeURL = async (req, res) => {
 
     if (targetLang !== 'en') {
       try {
-        finalSummary = await libreTranslate(englishSummary, targetLang);
+        const translated = await translate(englishSummary, { to: targetLang });
+        finalSummary = translated.text;
       } catch (err) {
         console.error('Translation Error:', err.message);
         return res.status(500).json({ message: 'Failed to translate summary' });
@@ -148,8 +124,8 @@ export const translateSummary = async (req, res) => {
   }
 
   try {
-    const translatedText = await libreTranslate(text, targetLanguage);
-    res.status(200).json({ translatedText });
+    const translated = await translate(text, { to: targetLanguage });
+    res.status(200).json({ translatedText: translated.text });
   } catch (err) {
     console.error('Translate Route Error:', err.message);
     res.status(500).json({ message: 'Translation failed' });
