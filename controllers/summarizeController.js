@@ -1,10 +1,36 @@
 import { getSummary } from '../utils/geminiUtil.js';
 import Summary from '../models/Summary.js';
-import pkg from '@vitalets/google-translate-api';
 import fetch from 'node-fetch';
 import { JSDOM } from 'jsdom';
 
-const { translate } = pkg;
+/**
+ * Helper function for LibreTranslate API
+ */
+async function libreTranslate(text, targetLang) {
+  try {
+    const res = await fetch('https://translate.argosopentech.com/translate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        q: text,
+        source: 'en',
+        target: targetLang,
+        format: 'text'
+      })
+    });
+
+    const data = await res.json();
+
+    if (data?.translatedText) {
+      return data.translatedText;
+    } else {
+      throw new Error('No translatedText returned from API');
+    }
+  } catch (err) {
+    console.error('LibreTranslate Error:', err.message);
+    return text; // Fallback to original text if translation fails
+  }
+}
 
 /**
  * POST /api/summarize
@@ -19,17 +45,11 @@ export const summarizeText = async (req, res) => {
 
   try {
     const englishSummary = await getSummary(text);
-    let finalSummary = englishSummary;
     const targetLang = language || 'en';
 
+    let finalSummary = englishSummary;
     if (targetLang !== 'en') {
-      try {
-        const translated = await translate(englishSummary, { to: targetLang });
-        finalSummary = translated.text;
-      } catch (err) {
-        console.error('Translation Error:', err.message);
-        return res.status(500).json({ message: 'Failed to translate summary' });
-      }
+      finalSummary = await libreTranslate(englishSummary, targetLang);
     }
 
     await Summary.create({
@@ -85,17 +105,10 @@ export const summarizeURL = async (req, res) => {
     const trimmedText = textContent.slice(0, 8000);
     const englishSummary = await getSummary(trimmedText);
 
-    let finalSummary = englishSummary;
     const targetLang = language || 'en';
-
+    let finalSummary = englishSummary;
     if (targetLang !== 'en') {
-      try {
-        const translated = await translate(englishSummary, { to: targetLang });
-        finalSummary = translated.text;
-      } catch (err) {
-        console.error('Translation Error:', err.message);
-        return res.status(500).json({ message: 'Failed to translate summary' });
-      }
+      finalSummary = await libreTranslate(englishSummary, targetLang);
     }
 
     await Summary.create({
@@ -124,8 +137,8 @@ export const translateSummary = async (req, res) => {
   }
 
   try {
-    const translated = await translate(text, { to: targetLanguage });
-    res.status(200).json({ translatedText: translated.text });
+    const translatedText = await libreTranslate(text, targetLanguage);
+    res.status(200).json({ translatedText });
   } catch (err) {
     console.error('Translate Route Error:', err.message);
     res.status(500).json({ message: 'Translation failed' });
