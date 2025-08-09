@@ -140,12 +140,21 @@ document.addEventListener("DOMContentLoaded", () => {
         `;
 
         li.querySelector(".delete-btn").addEventListener("click", async () => {
-          await fetch(`${API_BASE}/summarize/${item._id}`, {
-            method: "DELETE",
-            headers: { Authorization: `Bearer ${token}` },
-          });
-          fetchHistory();
-        });
+  if (!confirm("🗑️ Are you sure you want to delete this summary?")) return;
+
+  try {
+    const res = await fetch(`${API_BASE}/summarize/${item._id}`, {
+      method: "DELETE",
+      headers: { Authorization: `Bearer ${token}` },
+    });
+
+    if (!res.ok) throw new Error("Failed to delete summary.");
+    fetchHistory();
+  } catch (err) {
+    console.error("Delete Single Summary Error:", err.message);
+    alert("❌ Failed to delete summary.");
+  }
+});
 
         historyContainer.appendChild(li);
       });
