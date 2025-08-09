@@ -8,7 +8,7 @@ import { JSDOM } from 'jsdom';
  */
 async function libreTranslate(text, targetLang) {
   try {
-    const res = await fetch('https://translate.argosopentech.com/translate', {
+    const res = await fetch('https://libretranslate.de/translate', {  // Updated API endpoint here
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -19,6 +19,10 @@ async function libreTranslate(text, targetLang) {
       })
     });
 
+    if (!res.ok) {
+      throw new Error(`LibreTranslate responded with status ${res.status}`);
+    }
+
     const data = await res.json();
 
     if (data?.translatedText) {
@@ -28,7 +32,7 @@ async function libreTranslate(text, targetLang) {
     }
   } catch (err) {
     console.error('LibreTranslate Error:', err.message);
-    return text; // Fallback to original text if translation fails
+    return text; // Fallback: return original text if translation fails
   }
 }
 
@@ -83,6 +87,10 @@ export const summarizeURL = async (req, res) => {
         'User-Agent': 'Mozilla/5.0 (Node.js fetch)',
       },
     });
+
+    if (!response.ok) {
+      return res.status(400).json({ message: 'Failed to fetch content from URL.' });
+    }
 
     const html = await response.text();
     const dom = new JSDOM(html);
