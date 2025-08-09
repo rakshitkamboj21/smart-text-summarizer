@@ -22,12 +22,12 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 // === CORS Configuration ===
-// === CORS Configuration ===
 const allowedOrigins = [
   "https://brilliant-peony-573c56.netlify.app",
   "https://moonlit-kitsune-4179ad.netlify.app",
   "https://silver-gumdrop-dc212b.netlify.app" // ✅ Your current site
 ];
+
 app.use(cors({
   origin: function (origin, callback) {
     // Allow requests with no origin (like mobile apps or curl)
@@ -37,14 +37,17 @@ app.use(cors({
       callback(new Error("CORS not allowed for this origin: " + origin));
     }
   },
-  methods: ["GET", "POST", "PUT", "DELETE"],
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"], // include OPTIONS
+  allowedHeaders: ["Content-Type", "Authorization"],   // allow required headers
   credentials: true,
 }));
 
+// Explicitly handle preflight requests for all routes
+app.options("*", cors());
 
 // Middleware
 app.use(express.json());
-app.use(express.urlencoded({ extended: true })); // Optional: parses form submissions
+app.use(express.urlencoded({ extended: true })); // Parses form submissions
 
 // API Routes
 app.use('/api/auth', authRoutes);
@@ -53,7 +56,7 @@ app.use('/api/email', emailRoutes);
 app.use('/api/contact', contactRoutes);
 
 // === Serve Frontend (Optional for monorepo hosting) ===
-// If you're hosting frontend separately (e.g., Netlify), you may not need this
+// If hosting frontend separately (Netlify), this part isn't required
 app.use(express.static(path.join(__dirname, '../client')));
 
 // Root route
