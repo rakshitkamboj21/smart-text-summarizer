@@ -1,40 +1,10 @@
 import { getSummary } from '../utils/geminiUtil.js';
 import Summary from '../models/Summary.js';
+import pkg from '@vitalets/google-translate-api';
 import fetch from 'node-fetch';
 import { JSDOM } from 'jsdom';
 
-/**
- * Helper function for LibreTranslate API
- */
-async function libreTranslate(text, targetLang) {
-  try {
-    const res = await fetch('https://libretranslate.de/translate', {  // Updated API endpoint here
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        q: text,
-        source: 'en',
-        target: targetLang,
-        format: 'text'
-      })
-    });
-
-    if (!res.ok) {
-      throw new Error(`LibreTranslate responded with status ${res.status}`);
-    }
-
-    const data = await res.json();
-
-    if (data?.translatedText) {
-      return data.translatedText;
-    } else {
-      throw new Error('No translatedText returned from API');
-    }
-  } catch (err) {
-    console.error('LibreTranslate Error:', err.message);
-    return text; // Fallback: return original text if translation fails
-  }
-}
+const { translate } = pkg;
 
 /**
  * POST /api/summarize
@@ -49,11 +19,17 @@ export const summarizeText = async (req, res) => {
 
   try {
     const englishSummary = await getSummary(text);
+    let finalSummary = englishSummary;
     const targetLang = language || 'en';
 
-    let finalSummary = englishSummary;
     if (targetLang !== 'en') {
-      finalSummary = await libreTranslate(englishSummary, targetLang);
+      try {
+        const translated = await translate(englishSummary, { to: targetLang });
+        finalSummary = translated.text;
+      } catch (err) {
+        console.error('Translation Error:', err.message);
+        return res.status(500).json({ message: 'Failed to translate summary' });
+      }
     }
 
     await Summary.create({
@@ -88,10 +64,6 @@ export const summarizeURL = async (req, res) => {
       },
     });
 
-    if (!response.ok) {
-      return res.status(400).json({ message: 'Failed to fetch content from URL.' });
-    }
-
     const html = await response.text();
     const dom = new JSDOM(html);
     const document = dom.window.document;
@@ -113,10 +85,17 @@ export const summarizeURL = async (req, res) => {
     const trimmedText = textContent.slice(0, 8000);
     const englishSummary = await getSummary(trimmedText);
 
-    const targetLang = language || 'en';
     let finalSummary = englishSummary;
+    const targetLang = language || 'en';
+
     if (targetLang !== 'en') {
-      finalSummary = await libreTranslate(englishSummary, targetLang);
+      try {
+        const translated = await translate(englishSummary, { to: targetLang });
+        finalSummary = translated.text;
+      } catch (err) {
+        console.error('Translation Error:', err.message);
+        return res.status(500).json({ message: 'Failed to translate summary' });
+      }
     }
 
     await Summary.create({
@@ -145,8 +124,8 @@ export const translateSummary = async (req, res) => {
   }
 
   try {
-    const translatedText = await libreTranslate(text, targetLanguage);
-    res.status(200).json({ translatedText });
+    const translated = await translate(text, { to: targetLanguage });
+    res.status(200).json({ translatedText: translated.text });
   } catch (err) {
     console.error('Translate Route Error:', err.message);
     res.status(500).json({ message: 'Translation failed' });
