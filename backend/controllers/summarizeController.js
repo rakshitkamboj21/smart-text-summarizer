@@ -13,7 +13,7 @@ const libreTranslate = async (text, targetLang) => {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         q: text,
-        source: 'en',
+        source: 'auto', // ✅ Detect source language automatically
         target: targetLang,
         format: 'text'
       })
@@ -27,7 +27,7 @@ const libreTranslate = async (text, targetLang) => {
     return data.translatedText;
   } catch (err) {
     console.error('LibreTranslate Error:', err.message);
-    return null; // fallback to English if translation fails
+    return null; // fallback to original if translation fails
   }
 };
 
@@ -43,10 +43,13 @@ export const summarizeText = async (req, res) => {
   }
 
   try {
+    // Step 1: Summarize in English
     const englishSummary = await getSummary(text);
+
     let finalSummary = englishSummary;
     const targetLang = language || 'en';
 
+    // Step 2: Translate if needed
     if (targetLang !== 'en') {
       const translated = await libreTranslate(englishSummary, targetLang);
       if (translated) {
@@ -54,6 +57,7 @@ export const summarizeText = async (req, res) => {
       }
     }
 
+    // Step 3: Save to DB
     await Summary.create({
       userId: req.user.id,
       originalText: text,
@@ -80,6 +84,7 @@ export const summarizeURL = async (req, res) => {
   }
 
   try {
+    // Fetch page content
     const response = await fetch(url, {
       headers: { 'User-Agent': 'Mozilla/5.0 (Node.js fetch)' },
     });
@@ -103,11 +108,14 @@ export const summarizeURL = async (req, res) => {
 
     // Limit to 8000 characters
     const trimmedText = textContent.slice(0, 8000);
+
+    // Step 1: Summarize in English
     const englishSummary = await getSummary(trimmedText);
 
     let finalSummary = englishSummary;
     const targetLang = language || 'en';
 
+    // Step 2: Translate if needed
     if (targetLang !== 'en') {
       const translated = await libreTranslate(englishSummary, targetLang);
       if (translated) {
@@ -115,6 +123,7 @@ export const summarizeURL = async (req, res) => {
       }
     }
 
+    // Step 3: Save to DB
     await Summary.create({
       userId: req.user.id,
       originalText: `Content from URL: ${url}`,
