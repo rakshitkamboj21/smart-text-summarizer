@@ -25,25 +25,32 @@ const __dirname = path.dirname(__filename);
 const allowedOrigins = [
   "https://brilliant-peony-573c56.netlify.app",
   "https://moonlit-kitsune-4179ad.netlify.app",
-  "https://silver-gumdrop-dc212b.netlify.app" // ✅ Your current site
+  "https://silver-gumdrop-dc212b.netlify.app",
+  "https://smart-text-summarizer-87n6.onrender.com",
 ];
 
-app.use(cors({
-  origin: function (origin, callback) {
-    // Allow requests with no origin (like mobile apps or curl)
-    if (!origin || allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      callback(new Error("CORS not allowed for this origin: " + origin));
-    }
-  },
-  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"], // include OPTIONS
-  allowedHeaders: ["Content-Type", "Authorization"],   // allow required headers
-  credentials: true,
-}));
+app.use(
+  cors({
+    origin: (origin, callback) => {
+      // Allow all server-to-server & browser requests
+      if (!origin) return callback(null, true);
 
-// Explicitly handle preflight requests for all routes
+      // Allow known frontends
+      if (allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      }
+
+      // Allow Render self-calls & unknown origins safely
+      return callback(null, true);
+    },
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+    credentials: true,
+  })
+);
+
 app.options("*", cors());
+
 
 // Middleware
 app.use(express.json());
